@@ -121,6 +121,8 @@ if __name__ == "__main__":
     format = lambda t: time.strftime("%Y-%m-%d %H:%M:%S %Z", time.localtime(t))
 
     up, noon, down = sun_events(now, lon, lat)
+
+    print "Now:             %s" % format(now)
     print "Sunrise:         %s" % format(up)
     print "Solar transit:   %s" % format(noon)
     print "Sunset:          %s" % format(down)
