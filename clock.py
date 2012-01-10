@@ -17,6 +17,11 @@ tau = 2 * pi
 lon = -10.756389
 lat = 59.949444
 
+day_colors = (0x00, 0x00, 0x00), (0xff, 0xff, 0xea)
+night_colors = (0x00, 0x00, 0x00), (0xff, 0x00, 0x00)
+
+bg, fg = day_colors
+
 def artoxy(a, r, xo=0, yo=0):
     angle = tau * a - tau / 4
     x = xo + int(r * cos(angle))
@@ -26,9 +31,6 @@ def artoxy(a, r, xo=0, yo=0):
 
 def draw_dial(dial):
     w, h = dial.get_size()
-
-    fg = 0xff, 0xff, 0xea
-    bg = 0x00, 0x00, 0x00
 
     dial.fill(bg)
 
@@ -60,16 +62,13 @@ def draw_dial(dial):
 def draw(screen, now):
     w, h = screen.get_size()
 
-    sunrise, noon, sunset = horology.sun_events(now, lon, lat)
+    sunrise, noon, sunset = [((t - time.timezone) / 3600) % 12 for t in horology.sun_events(now, lon, lat)]
 
     local_now = now - time.timezone
     minutes = (local_now / 60) % 60
     hours = (local_now / 3600) % 12
 
     draw_dial(screen)
-
-    fg = 0xff, 0xff, 0xea
-    bg = 0x00, 0x00, 0x00
 
     xo = w // 2
     yo = h // 2
@@ -90,6 +89,16 @@ def draw(screen, now):
     gfxdraw.filled_polygon(screen, points, fg)
 
     gfxdraw.filled_circle(screen, xo, yo, int(ro), fg)
+
+    r = 0.25 * min(w, h)
+
+    a = sunrise / 12
+    x, y = artoxy(a, r, xo, yo)
+    gfxdraw.filled_circle(screen, x, y, int(0.25 * ro), fg)
+
+    a = sunset / 12
+    x, y = artoxy(a, r, xo, yo)
+    gfxdraw.filled_circle(screen, x, y, int(0.25 * ro), fg)
 
 def main():
     pygame.init()
@@ -126,6 +135,12 @@ def main():
                 return 0
             elif event.key == pygame.K_q:
                 return 0
+            elif event.key == pygame.K_d:
+                global bg, fg
+                bg, fg = day_colors
+            elif event.key == pygame.K_n:
+                global bg, fg
+                bg, fg = night_colors
 
         elif event.type == pygame.QUIT:
             return 0
