@@ -106,6 +106,18 @@ def sun_events(t, l_w, phi):
 
     return tuple(map(julian_to_unix, [J_rise, J_transit, J_set]))
 
+def lunar_phase(t):
+    """Return the phase of the moon at UNIX time t.
+
+    >>> lunar_phase(1328980430.472815)
+    0.1302754907133155
+    """
+
+    lunar_period = 29.530588853 * 86400
+    last_full_moon = 1328648040
+
+    return ((t - last_full_moon) % lunar_period) / lunar_period
+
 if __name__ == "__main__":
     import doctest
     failed, attempted = doctest.testmod()
@@ -126,3 +138,4 @@ if __name__ == "__main__":
     print "Sunrise:         %s" % format(up)
     print "Solar transit:   %s" % format(noon)
     print "Sunset:          %s" % format(down)
+    print "Lunar phase:     %.1f%%" % lunar_phase(now)
